@@ -9,25 +9,25 @@ __precompile__()
 dir::String = @__DIR__
 res::String = dir * "/../resources"
 
-abstract type AbstractCloreplethResource end
+abstract type AbstractChoreplethResource end
 
-struct CloreplethResource <: AbstractCloreplethResource
+struct ChoreplethResource <: AbstractChoreplethResource
     uri::String
     dim::Pair{Int64, Int64}
     names::Dict{String, Vector{Pair{String, String}}}
 end
 
-struct RemoteCloreplethResource <: AbstractCloreplethResource
+struct RemoteChoreplethResource <: AbstractChoreplethResource
     name::String
     url::String
     dim::Pair{Int64, Int64}
     names::Dict{String, Vector{Pair{String, String}}}
 end
 
-download_resource(rm::RemoteCloreplethResource, uri::String = pwd()) = begin
+download_resource(rm::RemoteChoreplethResource, uri::String = pwd()) = begin
     uri = uri * "/" * rm.name * ".svg"
     DLS.download(rm.url, uri)
-    CloreplethResource(uri, rm.dim, rm.names)::CloreplethResource
+    ChoreplethResource(uri, rm.dim, rm.names)::ChoreplethResource
 end
 
 def_names = Dict{String, Vector{Pair{String, String}}}("landxx" => ["fill"  => "lightgray", "stroke" => "#333333", "stroke-width" => ".5"], 
@@ -41,15 +41,15 @@ def_names = Dict{String, Vector{Pair{String, String}}}("landxx" => ["fill"  => "
 "eu" => ["fill"  => "blue", "stroke" => "#333333", "stroke-width" => ".5"], 
 "circlexx" => ["opacity" => "0%"])
 
-const world_map = CloreplethResource(res * "/world.svg", 2754 => 1398, def_names)
+const world_map = ChoreplethResource(res * "/world.svg", 2754 => 1398, def_names)
 
-const europe_map = CloreplethResource(res * "/europe_map.svg", 680 => 520, Dict{String, Vector{Pair{String, String}}}())
+const europe_map = ChoreplethResource(res * "/europe_map.svg", 680 => 520, Dict{String, Vector{Pair{String, String}}}())
 
-const euromote_test = RemoteCloreplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
+const euromote_test = RemoteChoreplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
 680 => 520, Dict{String, Vector{Pair{String, String}}}())
 
-function clorepleth_legend!(con::Gattino.AbstractContext, x::Vector{String}, y::Vector{<:Number}, colors::Vector{String}; align::String = "top-left")
-    scaler::Int64 = Int64(round(con.dim[1] * .24))
+function chorepleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
+    scaler::Number = Int64(round(con.dim[1] * .50))
     positionx::Int64 = Int64(round(con.dim[1] / 2)) + con.margin[1]
     if contains(align, "right")
         positionx += scaler
@@ -57,19 +57,38 @@ function clorepleth_legend!(con::Gattino.AbstractContext, x::Vector{String}, y::
         positionx -= scaler
     end
     positiony::Int64 = Int64(round(con.dim[2] / 2)) + con.margin[2]
-    scaler = Int64(round(con.dim[2] * .20))
+    scaler = Int64(round(con.dim[2] * .22))
     if contains(align, "top")
         positiony -= scaler
     elseif contains(align, "bottom")
         positiony += scaler
     end
-    legend_bg = rect(width = con.dim[1] * .1, height = con.dim[2] * .1, x = positionx, positiony = 55)
-    style!(legend_bg, "fill" => "white", "stroke" => "2px solid #333333", "border-radius" => 3px)
-    push!(con.window[:children], legend_bg)
+    legend_height = con.dim[2] * .15
+    legend_width = con.dim[1] * .20
+    legend_bg = rect(width = legend_width, height = legend_height, x = positionx, y = positiony)
+    style!(legend_bg, "fill" => "white", "stroke" => "#333333", "border-radius" => 3px, "stroke-width" => 2px)
+    scaler = Int64(round(legend_width * .1))
+    n = length(colors)
+    grad_y = Int64(round(legend_height * .35)) + positiony
+    grad_position = positionx + scaler
+    grad::String = ""
+    for x in range(.1, 1, step = .12)
+        grad_box = rect(x = positionx + grad_position, y = grad_y,
+        width = scaler, height = 3)
+        style!(grad_box, "fill" => colors[Int64(round(x * n))])
+        grad = grad * string(grad_box)
+        grad_position += scaler
+    end
+    label_height = positiony + Int64(round(legend_height * .70))
+    label1 = ToolipsSVG.text(x = positionx + scaler, y = label_height, text = x[1])
+    label2 = ToolipsSVG.text(x = positionx + legend_width - (scaler * 3), y = label_height, text = x[2])
+    style!(label1, "stroke" => "#333333")
+    style!(label2, "stroke" => "#333333", "fill" => "blue")
+    con.window[:text] = con.window[:text] * string(legend_bg) * grad * string(label1) * string(label2)
     nothing
 end
 
-function clorepleth(x::Vector{String}, y::Vector{<:Number}, rs::CloreplethResource, colors::Vector{String} = ["red", "pink"])
+function chorepleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoreplethResource, colors::Vector{String} = ["red", "pink"])
     maxy::Number = maximum(y)
     pleth::Context = context(rs.dim[1], rs.dim[2]) do con::Context
         con.window[:text] = replace(read(rs.uri, String), "\"" => "'")
@@ -86,14 +105,14 @@ function clorepleth(x::Vector{String}, y::Vector{<:Number}, rs::CloreplethResour
     pleth::Context
 end
 
-function clorepleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteCloreplethResource, args ...)
+function chorepleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteChoreplethResource, args ...)
     rs = download_resource(rs)
-    clorepleth(x, y, rs, args ...)
+    chorepleth(x, y, rs, args ...)
 end
 
 function scale!(con::Context, w::Int64, h::Int64, x::Int64 = 0, y::Int64 = 0)
     con.window["viewBox"] = "$x $y $w $h"
 end
 
-export clorepleth, scale!
+export chorepleth, scale!
 end # module GattinoPleths
