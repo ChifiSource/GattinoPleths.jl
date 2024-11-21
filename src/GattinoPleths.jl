@@ -9,25 +9,25 @@ __precompile__()
 dir::String = @__DIR__
 res::String = dir * "/../resources"
 
-abstract type AbstractChoreplethResource end
+abstract type AbstractChoroplethResource end
 
-struct ChoreplethResource <: AbstractChoreplethResource
+struct ChoroplethResource <: AbstractChoroplethResource
     uri::String
     dim::Pair{Int64, Int64}
     names::Dict{String, Vector{Pair{String, String}}}
 end
 
-struct RemoteChoreplethResource <: AbstractChoreplethResource
+struct RemoteChoroplethResource <: AbstractChoroplethResource
     name::String
     url::String
     dim::Pair{Int64, Int64}
     names::Dict{String, Vector{Pair{String, String}}}
 end
 
-download_resource(rm::RemoteChoreplethResource, uri::String = pwd()) = begin
+download_resource(rm::RemoteChoroplethResource, uri::String = pwd()) = begin
     uri = uri * "/" * rm.name * ".svg"
     DLS.download(rm.url, uri)
-    ChoreplethResource(uri, rm.dim, rm.names)::ChoreplethResource
+    ChoroplethResource(uri, rm.dim, rm.names)::ChoroplethResource
 end
 
 def_names = Dict{String, Vector{Pair{String, String}}}("landxx" => ["fill"  => "lightgray", "stroke" => "#333333", "stroke-width" => ".5"], 
@@ -41,14 +41,14 @@ def_names = Dict{String, Vector{Pair{String, String}}}("landxx" => ["fill"  => "
 "eu" => ["fill"  => "blue", "stroke" => "#333333", "stroke-width" => ".5"], 
 "circlexx" => ["opacity" => "0%"])
 
-const world_map = ChoreplethResource(res * "/world.svg", 2754 => 1398, def_names)
+const world_map = ChoroplethResource(res * "/world.svg", 2754 => 1398, def_names)
 
-const europe_map = ChoreplethResource(res * "/europe_map.svg", 680 => 520, Dict{String, Vector{Pair{String, String}}}())
+const europe_map = ChoroplethResource(res * "/europe_map.svg", 680 => 520, Dict{String, Vector{Pair{String, String}}}())
 
-const euromote_test = RemoteChoreplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
+const euromote_test = RemoteChoroplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
 680 => 520, Dict{String, Vector{Pair{String, String}}}())
 
-function chorepleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
+function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
     scaler::Number = Int64(round(con.dim[1] * .50))
     positionx::Int64 = Int64(round(con.dim[1] / 2)) + con.margin[1]
     if contains(align, "right")
@@ -88,7 +88,7 @@ function chorepleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String
     nothing
 end
 
-function chorepleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoreplethResource, colors::Vector{String} = ["red", "pink"])
+function choropleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoroplethResource, colors::Vector{String} = ["red", "pink"])
     maxy::Number = maximum(y)
     pleth::Context = context(rs.dim[1], rs.dim[2]) do con::Context
         con.window[:text] = replace(read(rs.uri, String), "\"" => "'")
@@ -105,14 +105,14 @@ function chorepleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoreplethResour
     pleth::Context
 end
 
-function chorepleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteChoreplethResource, args ...)
+function choropleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteChoroplethResource, args ...)
     rs = download_resource(rs)
-    chorepleth(x, y, rs, args ...)
+    choropleth(x, y, rs, args ...)
 end
 
 function scale!(con::Context, w::Int64, h::Int64, x::Int64 = 0, y::Int64 = 0)
     con.window["viewBox"] = "$x $y $w $h"
 end
 
-export chorepleth, scale!
+export choropleth, scale!
 end # module GattinoPleths
