@@ -171,6 +171,7 @@ The `choropleth_legend!` function adds a legend to an existing choropleth. This 
 pleth2 = choropleth(["de", "fr", "it"], [5, 45, 30], GattinoPleths.euromote_test, red_and_blue)
 # add a legend:
 GattinoPleths.choropleth_legend!(pleth2, "low" => "high", red_and_blue, align = "top-left") 
+
 ```
 """
 function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
