@@ -155,7 +155,8 @@ const world_map = ChoroplethResource(res * "/world.svg", 2754 => 1398, def_names
 const europe_map = RemoteChoroplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
 680 => 520, Dict{String, Vector{Pair{String, String}}}())
 
-const usa_map = RemoteChoroplethResource("usa", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/united%20states/us.svg")
+const usa_map = RemoteChoroplethResource("usa", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/united%20states/us.svg", 
+959 => 593, Dict{String, Vector{Pair{String, String}}}())
 
 """
 ```julia
