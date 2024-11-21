@@ -89,7 +89,7 @@ Rather than storing the source SVG file in a local URI, we download it on comman
     provided directly to `choropleth`, or downloaded into a `ChoroplethResource` and then provided as 
     is done by the `RemoteChoroplethResource` binding of `choropleth`
 
-- See also: `AbstractChoroplethResource`, `RemoteChoroplethResource`, `choropleth`, `download_resource`
+- See also: `AbstractChoroplethResource`, `ChoroplethResource`, `choropleth`, `download_resource`
 ```julia
 RemoteChoroplethResource(::String, ::String, ::Pair{Int64, Int64}, ::Dict{String, Vector{String, String}})
 ```
@@ -110,6 +110,29 @@ struct RemoteChoroplethResource <: AbstractChoroplethResource
     names::Dict{String, Vector{Pair{String, String}}}
 end
 
+"""
+```julia
+download_resource(rm::RemoteChoroplethResource, uri::String = pwd()) -> ::ChoroplethResource
+```
+Downloads a `RemoteChoroplethResource`, providing a normal `ChoroplethResource` corresponding 
+to the newly downloaded file in return. When calling this function, the resource will download 
+to the provided `uri`. When this function is called from `choropleth`, it will automatically download 
+the file into a new `uri` at `pwd` * `RemoteChoroplethResource.name`.
+---
+```example
+const europe_map = RemoteChoroplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
+680 => 520, Dict{String, Vector{Pair{String, String}}}())
+
+local_euro_resource = download_resource(rm, "sample.svg")
+
+choropleth = choropleth(x, y, local_euro_resource)
+
+# we can also skip the `download_resource` step to implicitly download the file 
+#   under the `RemoteChoroplethResource`'s `name`.
+
+choropleth(x, y, europe_map)
+```
+"""
 download_resource(rm::RemoteChoroplethResource, uri::String = pwd()) = begin
     uri = uri * "/" * rm.name * ".svg"
     DLS.download(rm.url, uri)
@@ -134,6 +157,22 @@ const europe_map = RemoteChoroplethResource("europe", "https://raw.githubusercon
 
 const usa_map = RemoteCloreplethResource("usa", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/united%20states/us.svg")
 
+"""
+```julia
+choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}) -> ::Nothing
+```
+The `choropleth_legend!` function adds a legend to an existing choropleth. This will create 
+    a " two-point" legend -- labeling each end of the gradient. Future versions will also 
+    implement a `(::AbstractContext, xcolors::Vector{Pair{String, String}})` method for labeling 
+        certain colors as categories directly.
+---
+```example
+# create 'euro' choropleth:
+pleth2 = choropleth(["de", "fr", "it"], [5, 45, 30], GattinoPleths.euromote_test, red_and_blue)
+# add a legend:
+GattinoPleths.choropleth_legend!(pleth2, "low" => "high", red_and_blue, align = "top-left") 
+```
+"""
 function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
     scaler::Number = Int64(round(con.dim[1] * .50))
     positionx::Int64 = Int64(round(con.dim[1] / 2)) + con.margin[1]
@@ -174,6 +213,26 @@ function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String
     nothing
 end
 
+"""
+```julia
+choropleth(x::Vector, y::Vector{<:Number}, resource::AbstractChoroplethResource, args ...) -> ::Gattino.Context
+```
+The `choropleth` function will create a choropleth from geographic labels (x),
+a continuous feature (y), a choropleth resource file (resource, an `AbstractChoroplethResource`), and 
+a provided `Vector` of colors. There is a dispatch for both a local `ChoroplethResource` and the 
+remote `RemoteChoroplethResource`. The latter will download a new file into an SVG file named 
+after the resource in your current working directory. Storing in your working directory is optional, 
+but in order to store elsewhere, use `download_resource` to " convert" a remote resource into a local one.
+```julia
+choropleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoroplethResource, colors::Vector{String}) -> ::Context
+choropleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteChoroplethResource, args ...) -> ::Context
+```
+---
+```example
+countries = ["mx", "us", "ca", "uk", "br", "au", "it", "ch", "ru", "in", "cn", "gl", "af", "bd", "jp", "iq"]
+pleth = choropleth(countries, [rand(1:100) for c in countries], GattinoPleths.world_map, red_and_blue)
+```
+"""
 function choropleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoroplethResource, colors::Vector{String} = ["red", "pink"])
     maxy::Number = maximum(y)
     pleth::Context = context(rs.dim[1], rs.dim[2]) do con::Context
@@ -196,6 +255,18 @@ function choropleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteChoroplethR
     choropleth(x, y, rs, args ...)
 end
 
+"""
+```julia
+scale!(con::Context, w::Int64, h::Int64, x::Int64 = 0, y::Int64 = 0)
+```
+Scales a `Gattino` `Context`to `w` and `h` dimensions from position `y`. This allows us to 
+zoom into our visualization, or set a certain part of our visualization to be visualized.
+---
+```example
+pleth2 = choropleth(["de", "fr", "it"], [5, 45, 30], GattinoPleths.euromote_test, red_and_blue)
+scale!(pleth2, 500, 500, 200, 250)
+```
+"""
 function scale!(con::Context, w::Int64, h::Int64, x::Int64 = 0, y::Int64 = 0)
     con.window["viewBox"] = "$x $y $w $h"
 end
