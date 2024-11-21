@@ -5,3 +5,6 @@ version = "0.0.9"
 
 [deps]
 Gattino = "f0fb3ee5-f608-41f3-a42d-dac276373afc"
+
+[compat]
+Gattino = "0.1.0"
