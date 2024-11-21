@@ -155,7 +155,7 @@ const world_map = ChoroplethResource(res * "/world.svg", 2754 => 1398, def_names
 const europe_map = RemoteChoroplethResource("europe", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/europe/europe_map.svg", 
 680 => 520, Dict{String, Vector{Pair{String, String}}}())
 
-const usa_map = RemoteCloreplethResource("usa", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/united%20states/us.svg")
+const usa_map = RemoteChoroplethResource("usa", "https://raw.githubusercontent.com/ChifiSource/GattinoPleths-Resources/refs/heads/main/united%20states/us.svg")
 
 """
 ```julia
@@ -171,7 +171,6 @@ The `choropleth_legend!` function adds a legend to an existing choropleth. This 
 pleth2 = choropleth(["de", "fr", "it"], [5, 45, 30], GattinoPleths.euromote_test, red_and_blue)
 # add a legend:
 GattinoPleths.choropleth_legend!(pleth2, "low" => "high", red_and_blue, align = "top-left") 
-
 ```
 """
 function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
