@@ -1,7 +1,10 @@
 name = "GattinoPleths"
 uuid = "9f033946-9ab4-431a-b842-48f7db4940ab"
 authors = ["emmac <emma boudreau>"]
-version = "0.1.0"
+version = "0.0.9"
 
 [deps]
 Gattino = "f0fb3ee5-f608-41f3-a42d-dac276373afc"
+
+[compat]
+Gattino = "0.1.0"

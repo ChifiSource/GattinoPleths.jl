@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://github.com/ChifiSource/image_dump/blob/main/gattino/gattinopleths.png"></img>
+<img src="https://github.com/ChifiSource/image_dump/blob/main/gattino/gattinopleths.png" width=350></img>
 </div>
 
 `GattinoPleths` provides the [Gattino](https://github.com/ChifiSource/Gattino.jl) ecosystem with choropleth visualizations. This allows us to display continuous data using a geographical feature.
