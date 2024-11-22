@@ -1,0 +1,58 @@
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.10.3"
+manifest_format = "2.0"
+project_hash = "a02ef3cc444f2fecca147b80450204450fce037a"
+
+[[deps.Base64]]
+uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[deps.Gattino]]
+deps = ["ToolipsSVG"]
+git-tree-sha1 = "444fbab09a72c589a900463837e2bbf6218471db"
+uuid = "f0fb3ee5-f608-41f3-a42d-dac276373afc"
+version = "0.1.1"
+
+[[deps.GattinoPleths]]
+deps = ["Gattino"]
+path = ".."
+uuid = "9f033946-9ab4-431a-b842-48f7db4940ab"
+version = "0.1.0"
+
+[[deps.InteractiveUtils]]
+deps = ["Markdown"]
+uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+
+[[deps.Logging]]
+uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+
+[[deps.Markdown]]
+deps = ["Base64"]
+uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[deps.Random]]
+deps = ["SHA"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[[deps.SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
+
+[[deps.Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+
+[[deps.Test]]
+deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
+uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[[deps.ToolipsSVG]]
+deps = ["ToolipsServables"]
+git-tree-sha1 = "eb4513cab88ebed20396834bcd634e97cba3655d"
+uuid = "8ae86ec9-919d-4ece-9a6d-09b7d28dae11"
+version = "0.2.0"
+
+[[deps.ToolipsServables]]
+deps = ["Base64", "Markdown"]
+git-tree-sha1 = "22c51e58ce619ead24551a6c026f6405c1dd0dba"
+uuid = "bf3a9e68-ca66-4981-8178-9d71c4f8abaa"
+version = "0.1.6"

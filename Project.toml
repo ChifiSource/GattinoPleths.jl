@@ -8,3 +8,10 @@ Gattino = "f0fb3ee5-f608-41f3-a42d-dac276373afc"
 
 [compat]
 Gattino = "0.1.0"
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
