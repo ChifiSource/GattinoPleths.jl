@@ -272,5 +272,5 @@ function scale!(con::Context, w::Int64, h::Int64, x::Int64 = 0, y::Int64 = 0)
     con.window["viewBox"] = "$x $y $w $h"
 end
 
-export choropleth, scale!
+export choropleth, scale!, download_resource
 end # module GattinoPleths
