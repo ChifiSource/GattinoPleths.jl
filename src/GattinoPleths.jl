@@ -174,7 +174,7 @@ pleth2 = choropleth(["de", "fr", "it"], [5, 45, 30], GattinoPleths.euromote_test
 GattinoPleths.choropleth_legend!(pleth2, "low" => "high", red_and_blue, align = "top-left") 
 ```
 """
-function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String}; align::String = "top-left")
+function choropleth_legend!(con::Gattino.AbstractContext, x::Pair{String, String}, colors::Vector{String} = Gattino.make_gradient((255, 0, 0), 10, -25, 0, 25); align::String = "top-left")
     scaler::Number = Int64(round(con.dim[1] * .50))
     positionx::Int64 = Int64(round(con.dim[1] / 2)) + con.margin[1]
     if contains(align, "right")
@@ -224,6 +224,8 @@ a provided `Vector` of colors. There is a dispatch for both a local `ChoroplethR
 remote `RemoteChoroplethResource`. The latter will download a new file into an SVG file named 
 after the resource in your current working directory. Storing in your working directory is optional, 
 but in order to store elsewhere, use `download_resource` to " convert" a remote resource into a local one.
+
+The resources will use lower-case abbreviations for region names.
 ```julia
 choropleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoroplethResource, colors::Vector{String}) -> ::Context
 choropleth(x::Vector{<:Any}, y::Vector{<:Number}, rs::RemoteChoroplethResource, args ...) -> ::Context
@@ -234,7 +236,10 @@ countries = ["mx", "us", "ca", "uk", "br", "au", "it", "ch", "ru", "in", "cn", "
 pleth = choropleth(countries, [rand(1:100) for c in countries], GattinoPleths.world_map, red_and_blue)
 ```
 """
-function choropleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoroplethResource, colors::Vector{String} = ["red", "pink"])
+function choropleth(x::Vector{String}, y::Vector{<:Number}, rs::ChoroplethResource, colors::Vector{String} = Gattino.make_gradient((255, 0, 0), 10, -25, 0, 25))
+    if length(x) != length(y)
+        throw(DimensionMismatch("x and y must be of the same length! got ($(length(x)), $(length(y)))"))
+    end
     maxy::Number = maximum(y)
     pleth::Context = context(rs.dim[1], rs.dim[2]) do con::Context
         con.window[:text] = replace(read(rs.uri, String), "\"" => "'")
